@@ -1,9 +1,9 @@
-name: Deploy Flask App
+name: Deploy to Production
 
 on:
   push:
     branches:
-      - main  # Trigger on pushes to main branch
+      - main
 
 jobs:
   build-and-deploy:
@@ -20,19 +20,16 @@ jobs:
 
       - name: Install dependencies
         run: |
-          python -m pip install --upgrade pip
           pip install -r requirements.txt
 
       - name: Run tests
-        run: |
-          python -m unittest discover
+        run: python -m unittest discover
 
       - name: Deploy to Production
-        if: github.ref == 'refs/heads/main'
         uses: easingthemes/ssh-deploy@v2.1.5
         with:
-          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
-          remote-user: ${{ secrets.REMOTE_USER }}
-          server-ip: ${{ secrets.SERVER_IP }}
-          remote-path: /path/to/your/app
-          local-path: .
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          REMOTE_HOST: ${{ secrets.REMOTE_HOST }}
+          REMOTE_USER: ${{ secrets.REMOTE_USER }}
+          TARGET: '/mnt/c/Users/ranep/Prod_Deployment'
+          
