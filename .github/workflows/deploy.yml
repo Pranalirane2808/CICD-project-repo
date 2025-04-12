@@ -1,35 +1,35 @@
-name: Deploy to Production
+name: Continuous delivery pipeline
 
 on:
   push:
-    branches:
-      - main
+    branches: [main]
 
 jobs:
-  build-and-deploy:
+  test:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
+    - name: Checkout code
+      uses: actions/checkout@v3
 
-      - name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.9'
+    - name: Set up python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.8'
 
-      - name: Install dependencies
-        run: |
-          pip install -r requirements.txt
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install flask pytest
 
-      - name: Run tests
-        run: python -m unittest discover
+    - name: Run tests
+      run: |
+        pytest test_app.py
 
-      - name: Deploy to Production
-        uses: easingthemes/ssh-deploy@v2.1.5
-        with:
-          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-          REMOTE_HOST: ${{ secrets.REMOTE_HOST }}
-          REMOTE_USER: ${{ secrets.REMOTE_USER }}
-          TARGET: '/mnt/c/Users/ranep/Prod_Deployment'
-          
+  deploy:
+    needs: test
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Simulate deployment
+      run: |
+        nohup python3 -m http.server 8000 &
